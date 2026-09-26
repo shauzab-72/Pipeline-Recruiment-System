@@ -1,0 +1,1287 @@
+#include <iostream>
+#include <string>
+using namespace std;
+template <class T>
+class ArrayList {
+private:
+	void regrow() {
+		if (maxCount == 0) {
+			maxCount = 4;
+		}
+		else maxCount = maxCount * 2;
+		T* temp = new T[maxCount];
+		for (int i = 0; i < count; i++) {
+			temp[i] = arr[i];
+		}
+		delete[] arr;
+		arr = temp;
+	}
+	void shrink() {
+		if(maxCount<=4){
+			return;
+		}
+		maxCount = maxCount / 2;
+		T* temp = new T[maxCount];
+			for (int i = 0; i < count; i++) {
+				temp[i] = arr[i];
+		}
+		delete[]arr;
+		arr = temp;
+	}
+public:
+	T* arr;
+	int maxCount;
+	int count;
+	ArrayList(int count=4) {
+		this->maxCount = count;
+		arr = new T[maxCount];
+		this->count = 0;
+	}
+	ArrayList(const ArrayList& Obj) {
+		if (this == &Obj) {
+			throw runtime_error("pointing at the same Object!");
+		}
+		this->maxCount = Obj.maxCount;
+		arr = new T[this->maxCount];
+		this->count = Obj.count;
+		for (int i = 0; i < this->count; i++) {
+			arr[i] = Obj.arr[i];
+		}
+	}
+	void operator=(const ArrayList& obj) {
+		if (this == &obj) {
+			throw runtime_error("pointing at the same Object!");
+		}
+		this->maxCount = obj.maxCount;
+		this->count = obj.count;
+		if (this->arr != nullptr)delete[]arr;
+		this->arr = new T[this->maxCount];
+		for (int i = 0; i < this->count; i++) {
+			this->arr[i] = obj.arr[i];
+		}
+	}
+	void shiftRight(int pos) {
+		if (pos<0 || pos>=count) {
+			throw runtime_error("Invalid entry");
+		}
+		for (int i = count; i > pos; i--) {
+			arr[i] = arr[i - 1];
+		}
+	}
+	void shiftLeft(int pos) {
+		if (pos<0 || pos>=count) {
+			throw runtime_error("Invalid entry");
+		}
+		for (int i = pos; i < count-1; i++) {
+			arr[i] = arr[i + 1];
+		}
+	}
+	bool isFull() {
+		return count == maxCount;
+	}
+	bool isEmpty() {
+		return count == 0;
+	}
+	void insertAtStart(T data) {
+		if (isFull()) { regrow(); }
+		if (count > 0) { shiftRight(0); }
+		arr[0] = data;
+		count++;
+	}
+	void insertAtEnd(T data) {
+		if (isFull()) { regrow(); }
+		arr[count] = data;
+		count++;
+	}
+	void insertAt(int pos, T data) {
+		if (pos < 0 || pos >= count) { 
+			throw runtime_error("Invalid entry"); 
+		}
+		else {
+			if (isFull()) { regrow(); }
+			if (count > 0) { shiftRight(pos); }
+			arr[pos] = data;
+			count++;
+		}
+	}
+	void insertAfter(T data, int pos) {
+		if (pos < 0 || pos >= count) {
+			throw runtime_error("Invalid entry");
+		}
+		insertAt(pos+1, data);
+	}
+	void insertBefore(T data, int pos) {
+		if (pos < 0 || pos >= count) {
+			throw runtime_error("Invalid entry");
+		}
+		insertAt(pos - 1, data);
+	}
+	void removeFromEnd() {
+		if (isEmpty()) { 
+			throw runtime_error("Empty list"); 
+		}
+		count--;
+		if (count <= maxCount / 4) { shrink();}
+	}
+	void removeFromStart() {
+		if (isEmpty()) {
+			throw runtime_error("Empty list");
+		}
+		if (count > 0) {
+			shiftLeft(0);
+		}
+		count--;
+		if (count <= maxCount / 4) { shrink(); }
+	}
+	void removeAt(int pos) {
+		if (isEmpty()) {
+			throw runtime_error("Empty list");
+		}
+		if (count > 0) { shiftLeft(pos); }
+		count--;
+		if (count <= maxCount / 4) { shrink(); }
+	}
+	void removeBefore(int pos) {
+		if (pos < 0 || pos >= count) {
+			throw runtime_error("Invalid entry");
+		}
+		removeAt(pos-1);
+	}
+	void removeAfter(int pos) {
+		if (pos < 0 || pos >= count) {
+			throw runtime_error("Invalid entry");
+		}
+		removeAt(pos+1);
+	}
+	void display()const {
+		for (int i = 0; i < count; i++) {
+			cout << arr[i] << " ";
+		}
+		cout << endl;
+	}
+	T& At(int& index) {
+		if (index < 0 || index >= count) {
+			throw runtime_error("Invalid entry");
+		}
+		return arr[index];
+	}
+	int getCount() const {
+		return count;
+	}
+	~ArrayList() {
+		delete[] arr;
+	}
+	friend ostream& operator<<(ostream& os, const ArrayList<T>& obj) {
+		for (int i = 0; i < obj.count; i++) {
+			os << obj.arr[i] << " ";
+		}
+		os << endl;
+		return os;
+	}
+};
+class Candidate {
+	int ID;
+	string name;
+	string University;
+	double CGPA;
+	int Experience;
+	int TechnicalScore;
+	int InterviewScore;
+	string* Skills;
+	int maxSkills;
+	int sCount;
+	bool Status;
+	void regrowSkills() {
+		if (maxSkills == 0) {
+			maxSkills = 2;
+		}
+		else maxSkills = maxSkills * 2;
+		string* temp = new string[maxSkills];
+		for (int i = 0; i < sCount; i++) {
+			temp[i] = Skills[i];
+		}
+		delete[]Skills;
+		Skills = temp;
+	}
+public:
+	Candidate() {
+		ID =0;
+		name = "\0";
+		University = "\0";
+		CGPA = 0.00;
+		sCount = 0;
+		Experience = 0;
+		TechnicalScore = 0;
+		InterviewScore = 0;
+		Skills = nullptr;
+		maxSkills = 0;
+		Status = false;
+	}
+	void configure() {
+		cout << "Enter all the candidate requirements" << endl;
+		int Experience=0, TechScore=0, interviewScore=0, maxSkills=0;
+		string name, university, skill;
+		double CGPA;
+		cin.ignore(1000, '\n');
+		cout << "enter your name: " << endl;
+		do {
+			getline(cin, name);
+			if (name.empty()||name=="\0"||name=="\n") {
+				cout << "empty string" << endl;
+			}
+		} while (name.empty()||name=="\0"||name=="\n");
+		this->name = name;
+		cout << "enter your university: " << endl;
+		do {
+			getline(cin, university);
+			if (university.empty() || university == "\0" || university == "\n") {
+				cout << "empty string" << endl;
+			}
+		} while (university.empty() || university == "\0" || university == "\n");
+		this->University = university;
+		cout << "Enter your CGPA: " << endl;
+		do {
+			while (!(cin >>CGPA) ) {
+				cout << "wrong data type" << endl;
+				cin.clear();
+				cin.ignore(1000, '\n');
+			}
+			if (CGPA <0.00||CGPA>4.00) {
+				cout << "Invalid Entry" << endl;
+			}
+		} while (CGPA < 0.00 || CGPA>4.00);
+		this->CGPA = CGPA;
+		cout << "enter your technical and interview score: " << endl;
+		do {
+			while ((!(cin >> TechScore)) || (!(cin>>interviewScore))) {
+				cout << "wrong data type" << endl;
+				cin.clear();
+				cin.ignore(1000, '\n');
+			}
+			if ((TechScore < 0 || TechScore>100) || (interviewScore < 0 || interviewScore>100)) {
+				cout << "Invalid entry" << endl;
+			}
+		}while ((TechScore < 0 || TechScore>100) || (interviewScore < 0 || interviewScore>100));
+		this->TechnicalScore = TechScore;
+		this->InterviewScore = interviewScore;
+		cout << "enter your experience: " << endl;
+		do {
+			while (!(cin >> Experience)) {
+				cout << "wrong data type" << endl;
+				cin.clear();
+				cin.ignore(1000, '\n');
+			}
+			if (Experience < 0) {
+				cout << "Invalid entry" << endl;
+			}
+		} while (Experience < 0);
+		this->Experience = Experience;
+		cout << "enter number of skills: " << endl;
+		do {
+			while (!(cin >> maxSkills)) {
+				cout << "wrong data type" << endl;
+				cin.clear();
+				cin.ignore(1000, '\n');
+			}
+			if (maxSkills < 0) {
+				cout << "Invalid entry" << endl;
+			}
+		} while (maxSkills < 0);
+		this->maxSkills = maxSkills;
+		if (Skills != nullptr) delete[]Skills;
+		sCount = 0;
+		Skills = new string[maxSkills];
+		cout << "How many skills do you want to add?" << endl;
+		int num;
+		do {
+			while (!(cin >> num)) {
+				cout << "wrong data type" << endl;
+				cin.clear();
+				cin.ignore(1000, '\n');
+			}
+			if (num <= 0) {
+				cout << "Invalid entry" << endl;
+			}
+		} while (num <= 0);
+		cin.ignore(1000, '\n');
+		for (int i = 0; i <num; i++) {
+			cout << "enter skill: " << i + 1 << endl;
+			do {
+				getline(cin, skill);
+				if (skill.empty()||searchSkill(skill)||skill=="\0"||skill=="\n") {
+					cout << "Invalid string/skill exists" << endl;
+				}
+			} while (skill.empty()||searchSkill(skill) || skill == "\0" || skill == "\n");
+			addSkill(skill);
+		}
+		Status = true;
+	}
+	Candidate(const Candidate& Obj) {
+		if (this == &Obj) {
+			throw runtime_error("pointing at the same object");
+		}
+		this->maxSkills = Obj.maxSkills;
+		this->sCount = Obj.sCount;
+		this->ID = Obj.ID;
+		this->name = Obj.name;
+		this->CGPA = Obj.CGPA;
+		this->University = Obj.University;
+		this->Experience = Obj.Experience;
+		this->TechnicalScore = Obj.TechnicalScore;
+		this->InterviewScore = Obj.InterviewScore;
+		this->Status = Obj.Status;
+		Skills = new string[maxSkills];
+		for (int i = 0; i < sCount; i++) {
+			this->Skills[i] = Obj.Skills[i];
+		}
+	}
+	Candidate& operator=(const Candidate& obj) {
+		if (this == &obj) { 
+			throw runtime_error("pointing to the same object");
+		}
+		this->maxSkills = obj.maxSkills;
+		sCount = obj.sCount;
+		this->ID = obj.ID;
+		this->name = obj.name;
+		this->CGPA = obj.CGPA;
+		this->Experience = obj.Experience;
+		this->University = obj.University;
+		this->TechnicalScore = obj.TechnicalScore;
+		this->InterviewScore = obj.InterviewScore;
+		this->Status = obj.Status;
+		if (this->Skills != nullptr)delete[]this->Skills;
+		Skills = new string[maxSkills];
+		for (int i = 0; i < sCount; i++) {
+			this->Skills[i] = obj.Skills[i];
+		}
+		return *this;
+	}
+	bool isFullSkills()const {
+		return sCount == maxSkills;
+	}
+	void setName(string name){
+		if (!name.empty()) { this->name = name; }
+		else {
+			throw runtime_error("empty string for name");
+		}
+	}
+	void setCGPA(double CGPA){
+		if (CGPA >0.00 && CGPA<4.01) { this->CGPA = CGPA; }
+		else { 
+			throw runtime_error("Invalid CGPA");
+		}
+	}
+	void setUniversity(string University) {
+		if (!University.empty()) { this->University = University; }
+		else {
+			throw runtime_error("empty string for university");
+		}
+	}
+	bool searchID(int ID) {
+		if (this->ID == ID) return true;
+		return false;
+	}
+	bool searchSkill(string skill) {
+		if (skill.empty()) {
+			return false;
+		}
+		for (int i = 0; i < sCount; i++) {
+			if (Skills[i] == skill) {
+				return true;
+			}
+		}
+		return false;
+	}
+	void setExperience(int Experience){
+		if (Experience > 0) { this->Experience = Experience; }
+		else Experience = 0;
+	}
+	void setTechScore(int TechScore){
+		if (TechScore > 0) { TechnicalScore = TechScore; }
+		else TechnicalScore = 0;
+	}
+	void setInterviewScore(int InterviewScore){
+		if (InterviewScore > 0) { this->InterviewScore = InterviewScore; }
+		else InterviewScore = 0;
+	}
+	void setID(int ID){
+		if ((ID < 1000 || ID>9999) || searchID(ID)) {
+			throw runtime_error("Invalid entry/ID already exists");
+		}
+		this->ID = ID;
+	}
+	void setStatus(bool Status){
+		this->Status = Status;
+	}
+	string getName()const {
+		if (name.empty() || name == "\n") {
+			throw runtime_error("empty string for name");
+		}
+		return name;
+	}
+	double getCGPA()const {
+		return CGPA;
+	}
+	string getUniversity()const {
+		if (University.empty() || University == "\n") {
+			throw runtime_error("empty string for university");
+		}
+		return University;
+	}
+	int getExperience() const{
+		return Experience;
+	}
+	int getTechScore() const{
+		return TechnicalScore;
+	}
+	int getInterviewScore() const{
+		return InterviewScore;
+	}
+	int getID() const{
+		return ID;
+	}
+	bool getStatus() const{
+		return Status;
+	}
+	int getCounter()const {
+		return sCount;
+	}
+	string getSkill(int& index)const {
+		if (index<0 || index>sCount) { 
+			throw runtime_error("Invalid entry"); 
+		}
+		return Skills[index];
+	}
+	~Candidate() {
+		delete[]Skills;
+	}
+	void addSkill(string skill) {
+		if (skill.empty() || skill == "\n") {
+			throw runtime_error("empty string for skill");
+		}
+		if (isFullSkills()) {
+			regrowSkills();
+		}
+		if (sCount < maxSkills) {
+			Skills[sCount] = skill;
+			sCount++;
+		}
+		else return;
+	}
+	bool isComplete() const{
+		if (ID<1000||ID>9999) {return false;}
+		if (CGPA < 0.00 || CGPA>4.00) {return false;}
+		if (Experience < 0) { return false; }
+		if (University.empty()||University=="\n"||University=="\0") { return false; }
+		if (name.empty() || name == "\n" || name == "\0") { return false; }
+		if (Status == false) { return false; }
+		if (sCount == 0) { return false; }
+		if (InterviewScore < 0 || InterviewScore>100) { return false; }
+		if (TechnicalScore < 0 || TechnicalScore>100) { return false; }
+		if (Skills == nullptr) { return false; }
+		return true;
+	}
+	void display()const {
+		cout << "----Candidate details----" << endl;
+		cout << "ID: " << ID << endl;
+		cout << "Name: " << name << endl;
+		cout << "CGPA: " << CGPA << endl;
+		cout << "Years of Experience: " << Experience << endl;
+		cout << "Technical Score: " << TechnicalScore << endl;
+		cout << "InterviewScore: " << InterviewScore << endl;
+		cout << "Skills: ";
+		for (int i = 0; i < sCount; i++) {
+			cout << Skills[i] << " ";
+		}cout << endl;
+		cout << "Status(isActive): " << Status << endl;
+		cout << "-------------------------" << endl;
+	}
+	bool checkSkill(const string& skill)const {
+		if (skill.empty()) {
+			throw runtime_error("empty string for skill");
+		}
+		for (int i = 0; i < sCount; i++) {
+			if (Skills[i] == skill) {
+				return true;
+			}
+		}
+		return false;
+	}
+	bool operator==(const Candidate& obj)const {
+		return this->ID == obj.ID;
+	}
+	bool operator==(int ID)const {
+		return this->ID == ID;
+	}
+	double getFinalScore() {
+		if (getCGPA() && getTechScore() && getInterviewScore()) {
+			double cgpaScore = (CGPA/4.00) * 100;
+			return (0.40 * cgpaScore) + (0.35 * TechnicalScore) + (0.25 * InterviewScore);
+		}
+	}
+	friend ostream& operator<<(ostream&, const Candidate&);
+};
+ostream& operator<<(ostream& os, const Candidate& obj) {
+	obj.display();
+	return os;
+}
+class Stage {
+public:
+	string stageName;
+	ArrayList<Candidate> candidates;
+	Stage* next;
+	Stage() {
+		stageName = "N/A";
+		next = nullptr;
+	}
+	Stage(string name, int maxCandidates=4):candidates(maxCandidates) {
+		this->stageName = name;
+	}
+	~Stage(){}
+};
+class RecruitmentPipeLine {
+	Stage* head;
+public:
+	RecruitmentPipeLine():head(nullptr) {
+		if (head == nullptr) {
+			head = new Stage("Applied");
+			head->next = new Stage("Screening");
+			head->next->next = new Stage("Technical Interview");
+			head->next->next->next = new Stage("HR Interview");
+			head->next->next->next->next = new Stage("Selected");
+		}
+	}
+	Stage* getHead()const {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		return head;
+	}
+	int lengthOfPipeline() {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		int size = 1;
+		Stage* temp = head;
+		while (temp->next != nullptr) {
+			size++;
+			temp = temp->next;
+		}
+		return size;
+	}
+	~RecruitmentPipeLine() {
+		if (head != nullptr) {
+			if (head->next == nullptr) {
+				delete head;
+			}
+			else {
+				Stage* prev = head;
+				Stage* curr = head->next;
+				while (curr != nullptr) {
+					delete prev;
+					prev = curr;
+					curr = curr->next;
+				}
+				delete prev;
+				cout << "Pipeline succesfully deleted" << endl;
+			}
+		}
+		else {
+			cout << "head already on NULL" << endl;
+		}
+	}
+	//Time complexity: O(n) -> single loop used
+	//Space complexity: O(1) -> only new stage on heap allocated 
+	void insertStage(string stageName,string afterStage ) {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Stage* curr = head;
+		Stage* newStage = new Stage(stageName);
+		while (curr != nullptr&&curr->stageName!=afterStage) {
+			curr = curr->next;
+		}
+		if (curr!= nullptr) {
+			newStage->next = curr->next;
+			curr->next = newStage;
+		}
+	}
+	//Time Complexity: O(n) -> single loop used
+	//Space Complexity: O(1) -> only unlinking and deleting a node
+	void removeStage(string name) {
+		if (head != nullptr) {
+			Stage* prev = head;
+			Stage* temp = head->next;
+			if (prev->candidates.getCount() != 0) { cout << "cannot remove stage" << endl;
+			return;
+			}
+			while (temp != nullptr) {
+				if (temp->stageName == name) {
+					prev->next = temp->next;
+					delete temp;
+					break;
+				}
+				prev = temp;
+				temp = temp->next;
+			}
+		}
+		else {
+			throw runtime_error("head on NULL");
+		}
+	}
+	//Time complexity: O(n) ->
+	// if the arrayList was a rectangle or a square then our time complexity would have been O(n^2) but
+	// since on every stage there exists different number of candidates, it does not become O(n^2) as 
+	// work of the loops is bounded by the total number of candidates, hence O(s(stages) + n(number of candidates))
+	//Space complexity: O(1) for best case, O(n) for worst case ->
+	//best case: second last line in if allows insertion at a correct index
+	//worst case: sceond last line triggers regrow() if arraylist is full and then inserts at the 
+	//given index
+	void moveCandidate(int CandidateID, string destinationStage) {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Stage* temp = head;
+		int size = lengthOfPipeline();
+		Candidate oldCandidate;
+		Stage* curr = head;
+		while (temp != nullptr && temp->stageName != destinationStage) {
+			temp = temp->next;
+		}
+		while (curr != nullptr) {
+			for (int i = 0; i < curr->candidates.getCount(); i++) {
+				if (curr->candidates.At(i).getID() == CandidateID) {
+					oldCandidate = curr->candidates.At(i);
+					curr->candidates.removeAt(i);
+					temp->candidates.insertAtEnd(oldCandidate);
+					return;
+				}
+			}
+			curr = curr->next;
+		}
+	}
+	//Time complexity: O(n^2) -> the first while and for loop generate the O(n) as we saw for moving a
+	//candidate but right after that the second while loop traverses from the very first node again, therefore
+	//causing an O(n^n) -> O(n^2)
+	//Space complexity: O(1) -> no new memory allocation, just traversing
+	void detectDuplicates() {
+		if (head != nullptr) {
+			Stage* curr = head;
+			bool isCorrupt= false;
+			while (curr != nullptr) {
+				for (int i = 0; i < curr->candidates.getCount(); i++) {
+					Stage* temp = curr;
+					//if candidate info is incomplete
+					while (temp != nullptr) {
+						for (int j=0; j < temp->candidates.getCount(); j++) {
+							if (temp == curr &&j<=i) { 
+								continue; 
+							}//if same index or pointing to same Node
+							if (curr->candidates.At(i).getID() == temp->candidates.At(j).getID()) {
+								cout << "PIPELINE CORRUPTED!" << endl;
+								cout << "Duplicate Candidate: ID =" << curr->candidates.At(i).getID() << endl;
+								cout<< " Found in: " << curr->stageName<<", "<< temp->stageName << endl;
+								isCorrupt = true;
+							}
+						}
+						temp = temp->next;
+					}
+				}
+				curr = curr->next;
+			}
+			if (!isCorrupt) {
+				cout << "No duplicate Ids" << endl;
+			}
+		}
+		else {
+			throw runtime_error("head on NULL");
+		}
+	}
+	//Time complexity: O(n) -> same logic as moveCandidate, jagged arrays allow O(s+n) instead of O(s*n)
+	//Space complexity: O(1) -> no new memory allocation, just traversing
+	void withdrawCandidate(int candidateID){
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Stage* temp = head;
+		while (temp != nullptr) {
+			for (int i = 0; i < temp->candidates.getCount(); i++) {
+			if (temp->candidates.At(i).getID() == candidateID) {
+				if (!temp->candidates.At(i).getStatus()) {
+					cout << "Candidate already withdrawn" << endl;
+					return;
+				}
+				temp->candidates.At(i).setStatus(false);
+				temp->candidates.removeAt(i);
+				return;
+				}			
+			}
+			temp = temp->next;
+		}
+		cout << "Candidate not found!" << endl;
+	}
+	//Time complexity: O(n) -> same scenario as moveCandidate
+	//Space complexity: O(1) -> no new memory allocation, just traversing
+	void updateTechnicalScore(int candidateID, int newScore) {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Stage* temp = head;
+		while (temp != nullptr) {
+			for (int i = 0; i < temp->candidates.getCount();i++) {
+				if (temp->candidates.At(i).getID() == candidateID&&temp->stageName=="Technical Interview") {
+					temp->candidates.At(i).setTechScore(newScore);
+				}
+			}
+			temp = temp->next;
+		}
+		cout << "Candidate not found!" << endl;
+	}
+	bool Search(int CandidateID) {
+		if (CandidateID < 1000 || CandidateID>9999) { return false; }
+		Stage* temp = head;
+		while (temp != nullptr) {
+			for (int i = 0; i < temp->candidates.getCount(); i++) {
+				if (temp->candidates.At(i).getID() == CandidateID) {
+					return true;
+				}
+			}
+			temp = temp->next;
+		}
+		return false;
+	}
+	bool SearchStage(string stage) {
+		if (stage.empty()) { return false; }
+		Stage* temp = head;
+		while (temp != nullptr) {
+			if (temp->stageName == stage) {
+				return true;
+			}
+			temp = temp->next;
+		}
+		return false;
+	}
+	//Time complexity: O(n) -> same scenario as moveCandidate
+	//Space complexity: O(1) -> no new memory allocation, just traversing
+	void updateInterviewScore(int candidateID, int newScore) {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Stage* temp = head;
+		while (temp != nullptr) {
+			for (int i = 0; i < temp->candidates.getCount(); i++) {
+				if (temp->candidates.At(i).getID() == candidateID&&temp->stageName=="HR Interview") {
+					temp->candidates.At(i).setInterviewScore(newScore);
+				}
+			}
+			temp = temp->next;
+		}
+		cout << "Candidate not found!" << endl;
+	}
+	//Time complexity: O(n) -> same scenario as in moveCandidate
+	//Space complexity: best case is O(1) (array has some empty spots so element can be added, no regrow()) and worst case
+	//is O(n) (array is full and this triggers regrow())
+	void promoteEligibleCandidates() {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Stage* temp = head;
+		bool isPromoted = false;
+		while (temp->next != nullptr) {
+			Candidate old;
+			for (int i = temp->candidates.getCount() - 1; i >= 0; i--) {
+				if (!temp->candidates.At(i).isComplete()) {
+					cout << "Incomplete candidate details" << endl;
+					continue;
+				}
+				if(temp->candidates.At(i).getStatus() == true){
+					if (temp->stageName == "Applied" && temp->candidates.At(i).getCGPA() >= 3.00) {
+						isPromoted = true;
+					}
+					else if (temp->stageName == "Screeing" && temp->candidates.At(i).getCGPA() >= 3.2 && temp->candidates.At(i).getCounter() >= 2) {
+						isPromoted = true;
+					}
+					else if (temp->stageName == "Technical Interview" && temp->candidates.At(i).getTechScore() >= 70) {
+						isPromoted = true;
+					}
+					else if (temp->stageName == "HR Interview" && temp->candidates.At(i).getTechScore() >= 80 && temp->candidates.At(i).getInterviewScore() >= 75) {
+						isPromoted = true;
+					}
+					if (isPromoted) {
+						old = temp->candidates.At(i);
+						temp->candidates.removeAt(i);
+						temp->next->candidates.insertAtEnd(old);
+					}
+				}
+			}
+			temp = temp->next;
+		}
+	}
+	//Time compelexity: O(n) -> checking only the max count
+	//Space complexity: O(1) -> no new memory allocation
+	Stage* getMostCrowdedStage() {
+		if (head != nullptr) {
+			Stage* curr = head;
+			Stage* prev = head;
+			int max = curr->candidates.getCount();
+			while (curr != nullptr){
+				if (curr->candidates.getCount() > max) {
+					max = curr->candidates.getCount();
+					prev = curr;
+				}
+
+				curr = curr->next;
+			}
+			return prev;
+		}
+		else {
+			throw runtime_error("head on NULL");
+		}
+	}
+	//Time complexity: O(n) -> one loop for reversal process
+	//Space complexity: O(1) -> no new memory allocation
+	Stage* reversePipeline() {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Stage* curr = head;
+		Stage* prev = nullptr;
+		Stage* next = nullptr;
+		while (curr != nullptr) {
+			next = curr->next;
+			curr->next = prev;
+			prev = curr;
+			curr = next;
+		}
+		return prev;
+	}
+	//Time complexity: O(n) -> single loop for display
+	//Space complexity: O(1) -> no new memory allocation
+	void displayStatistics()const {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Stage* temp = head;
+		while (temp != nullptr) {
+			cout << "===================================" << endl;
+				cout <<"Stage: "<< temp->stageName << "->";
+				cout << "candidates: ";
+				if (temp->candidates.getCount() == 0) {
+					cout << "no candidates in this stage" << endl;
+					cout << "===================================" << endl;
+					temp = temp->next;
+					continue;
+				}
+				else {
+					for (int i = 0; i < temp->candidates.getCount(); i++) {
+						cout << "\nCandidate " << i + 1 << endl;
+						temp->candidates.At(i).display();
+					}
+					cout << "===================================" << endl;
+				}
+			temp = temp->next;
+		}
+	}
+	//Time complexity: O(n) -> single loop for check
+	//Space complexity: O(1) -> no new memmory allocation
+	bool hasCycle() {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Stage* fast = head;
+		Stage* slow = head;
+		while (fast != nullptr && fast->next != nullptr) {
+			slow = slow->next;
+			fast = fast->next->next;
+		}
+		if (slow == fast) {
+			return true;
+		}
+		return false;
+	}
+	//Time complexity: O(n) -> same as we saw in moveCandidate
+	//Space complexity: best case is O(1) (array had empty spots so no regrow() trigger) and worst case is O(n)
+	//(array is full and this triggers regrow() to allocate new spots)
+	ArrayList<Candidate> findCandidatesBySkill(const string& skill){
+		if (head == nullptr||skill.empty()) {
+			throw runtime_error("head on NULL/empty string for skill");
+		}
+		ArrayList<Candidate> newArr;
+		Stage* temp = head;
+		while (temp != nullptr) {
+			for (int i = 0; i < temp->candidates.getCount(); i++) {
+					if (temp->candidates.At(i).checkSkill(skill)) {
+							Candidate old;
+							old = temp->candidates.At(i);
+							newArr.insertAtStart(old);
+							break;
+					}
+			
+		}
+			temp = temp->next;
+		}
+		return newArr;
+	}
+	void addCandidate(string stageName) {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Stage* temp = head;
+		while (temp != nullptr && temp->stageName!=stageName) {
+			temp = temp->next;
+		}
+		if (temp == nullptr) {
+			cout<<"stage does not exist" << endl;
+			return;
+		}
+		int ID = 0;
+		cout << "enter your ID (check if it exists)" << endl;
+		do {
+			while (!(cin >> ID)) {
+				cout << "Invalid data type" << endl;
+				cin.clear();
+				cin.ignore(1000,'\n');
+			}
+			if (ID < 1000 || ID>9999) {
+				cout << "Invalid entry" << endl;
+			}
+		} while (ID < 1000 || ID>9999);
+			Candidate newCandid;
+			newCandid.setID(ID);
+			newCandid.configure();
+			temp->candidates.insertAtEnd(newCandid);
+			cout << "Candidate added" << endl;
+	}
+	//Time complexity: O(n) -> same jagged concept as we saw in moveCandidate
+	//Space complexity: O(1) -> no new memory allocation, only output returned
+	Candidate getBestCandidate() {
+		if (head == nullptr) {
+			throw runtime_error("head on NULL");
+		}
+		Candidate* bestCand = nullptr;
+		Stage* curr = head;
+		while (curr != nullptr) {
+			for (int i = 0; i < curr->candidates.getCount(); i++) {
+				Candidate* next = &curr->candidates.At(i);
+				if (bestCand == nullptr) {
+					bestCand = next;
+				}
+				if (bestCand->getFinalScore() < next->getFinalScore()) {
+					bestCand = next;
+				}
+				else if (bestCand->getFinalScore() == next->getFinalScore()) {
+					if (bestCand->getTechScore() < next->getTechScore()) {
+						bestCand = next;
+					}
+					else if (bestCand->getTechScore() == next->getTechScore()) {
+						if (bestCand->getCGPA() > next->getCGPA()) {
+							bestCand = next;
+						}
+						else if (bestCand->getCGPA() == next->getCGPA()) {
+							if (bestCand->getID() > next->getID()) {
+								bestCand = next;
+							}
+						}
+					}
+				}
+			}
+			curr = curr->next;
+		}
+		if (bestCand == nullptr) {
+			throw runtime_error("best on NULL");
+		}
+		return *bestCand;
+	}
+};
+int main() {
+	RecruitmentPipeLine r1;
+	int choice = -1;
+	while (true) {
+		cout << "\n=== Recruiment Pipeline Manager ===" << endl;
+		cout << "1. Insert a new Stage" << endl;
+		cout << "2. Add a candidate" << endl;
+		cout << "3. Reverse a Pipeline" << endl;
+		cout << "4. Find Number of Stages" << endl;
+		cout << "5. Remove a stage" << endl;
+		cout << "6. Display Statistics" << endl;
+		cout << "7. Detect Cycles in the Pipeline" << endl;
+		cout << "8. Move a Candidate" << endl;
+		cout << "9. Update Technical Score" << endl;
+		cout << "10. Update Interview Score" << endl;
+		cout << "11. Detect any Duplicate ID" << endl;
+		cout << "12. Filter candidates by given Skill" << endl;
+		cout << "13. Get the Most Crowded Stage" << endl;
+		cout << "14. Withdraw a Candidate" << endl;
+		cout << "15. Promote Eligible Candidates" << endl;
+		cout << "16. Find the Best Candidate" << endl;
+		cout << "0. Exit" << endl;
+		cout << "=== Recruiment Pipeline Manager ===" << endl;
+		cout << "Enter your choice: ";
+		do {
+			while (!(cin >> choice)) {
+				cout << "Wrong data type" << endl;
+				cin.clear();
+				cin.ignore(1000, '\n');
+			}
+			if (choice < 0 || choice>16) {
+				cout << "Try again!" << endl;
+			}
+		} while (choice < 0 || choice>16);
+		cout << "\n";
+		try {
+			switch (choice) {
+			case 1: {
+				string newStage;
+				string oldStage;
+				cout << "\nEnter new Stage: ";
+				//clears leftover line for menu selction
+				cin.ignore(1000, '\n');
+				do {
+					getline(cin, newStage);
+					if (newStage.empty() || r1.SearchStage(newStage)) cout << "Try Again" << endl;
+				} while (newStage.empty() || r1.SearchStage(newStage));
+				cout << "\nEnter old Stage: ";
+				do {
+					getline(cin, oldStage);
+					if (oldStage.empty() || !r1.SearchStage(oldStage)) cout << "Try Again" << endl;
+				} while (oldStage.empty() || !r1.SearchStage(oldStage));
+				r1.insertStage(newStage, oldStage);
+				break;
+			}
+			case 2: {
+				string stageName;
+				cout << "\nEnter your stageName" << endl;
+				cin.ignore(1000, '\n');
+				do {
+					getline(cin, stageName);
+					if (stageName.empty() || stageName == "\n" || stageName == "\0") {
+						cout << "Invalid string" << endl;
+					}
+				} while (stageName.empty() || stageName == "\n" || stageName == "\0");
+				r1.addCandidate(stageName);
+				break;
+			}
+			case 3:
+			{
+				Stage* reversed = r1.reversePipeline();
+				cout << "\nDo you want to check the reversed pipeline ? (y / n) " << endl;
+				char check;
+				do {
+					cin >> check;
+					if (check != 'y' && check != 'n' && check != 'Y' && check != 'N') {
+						cout << "invalid char" << endl;
+					}
+				} while (check != 'y' && check != 'n' && check != 'Y' && check != 'N');
+				if (check == 'y' || check == 'Y') {
+					while (reversed != nullptr) {
+						cout << "===================================" << endl;
+						cout << "Stage: " << reversed->stageName << "->";
+						cout << "candidates: ";
+						if (reversed->candidates.getCount() == 0) {
+							cout << "no candidates in this stage" << endl;
+							cout << "===================================" << endl;
+							reversed = reversed->next;
+							continue;
+						}
+						else {
+							for (int i = 0; i < reversed->candidates.getCount(); i++) {
+								cout << "\nCandidate " << i + 1 << endl;
+								reversed->candidates.At(i).display();
+								cout << "===================================" << endl;
+							}
+						}
+						reversed = reversed->next;
+					}
+				}
+				break;
+			}
+			case 4:
+				cout << "\nTotal stages in Pipeline: " << r1.lengthOfPipeline() << endl;
+				break;
+			case 5:
+			{
+				string oldStage;
+				cin.ignore(1000, '\n');
+				cout << "\nEnter the stage to remove" << endl;
+				do {
+					getline(cin, oldStage);
+					if (oldStage.empty() || oldStage == "\n" || oldStage == "\0"
+						|| !r1.SearchStage(oldStage)) {
+						cout << "Invalid string" << endl;
+					}
+				} while (oldStage.empty() || oldStage == "\n" || oldStage == "\0"
+					|| !r1.SearchStage(oldStage));
+				r1.removeStage(oldStage);
+				break;
+			}
+			case 6: {
+				r1.displayStatistics();
+				break;
+			}
+			case 7: {
+				bool isLoop = r1.hasCycle();
+				if (isLoop) {
+					cout << "Cycle detected" << endl;
+				}
+				else
+					cout << "No cycles in the PipeLine" << endl;
+				break;
+			}
+			case 8: {
+				int ID;
+				cout << "\nenter your ID: ";
+				do {
+					while (!(cin >> ID)) {
+						cout << "Wrong data type" << endl;
+						cin.clear();
+						cin.ignore(1000, '\n');
+					}
+					if ((ID < 1000 || ID>9999) || !r1.Search(ID)) {
+						cout << "Out of range/Not in List" << endl;
+					}
+				} while ((ID < 1000 || ID>9999) || !r1.Search(ID));
+				cout << "Enter your stage: ";
+				cin.ignore(1000, '\n');
+				string targetStage;
+				do {
+					getline(cin, targetStage);
+					if (targetStage.empty() || targetStage == "\0" || targetStage == "\n" ||
+						!r1.SearchStage(targetStage)) {
+						cout << "Invalid string" << endl;
+					}
+				} while (targetStage.empty() || !r1.SearchStage(targetStage));
+				r1.moveCandidate(ID, targetStage);
+				break;
+			}
+			case 9: {
+				int ID;
+				int TechScore;
+				cout << "\nEnter your ID: ";
+				do {
+					while (!(cin >> ID)) {
+						cout << "Wrong data type" << endl;
+						cin.clear();
+						cin.ignore(1000, '\n');
+					}
+					if ((ID < 1000 || ID>9999) || !r1.Search(ID)) {
+						cout << "Invalid entry" << endl;
+					}
+				} while ((ID < 1000 || ID>9999) || !r1.Search(ID));
+				cout << "Enter your Technical Score:";
+				do {
+					while (!(cin >> TechScore)) {
+						cout << "Wrong data type" << endl;
+						cin.clear();
+						cin.ignore(1000, '\n');
+					}
+					if (TechScore < 0 || TechScore>100) {
+						cout << "Invalid entry" << endl;
+					}
+				} while (TechScore < 0 || TechScore>100);
+				r1.updateTechnicalScore(ID, TechScore);
+				break;
+			}
+			case 10: {
+				int ID, InterviewScore;
+				cout << "\nEnter Candidate ID: ";
+				do {
+					while (!(cin >> ID)) {
+						cout << "Wrong data type" << endl;
+						cin.clear();
+						cin.ignore(1000, '\n');
+					}
+					if ((ID < 1000 || ID > 9999) || !r1.Search(ID)) {
+						cout << "Invalid entry" << endl;
+					}
+				} while ((ID < 1000 || ID > 9999) || !r1.Search(ID));
+				cout << "Enter your Interview Score:";
+				do {
+					while (!(cin >> InterviewScore)) {
+						cout << "Wrong data type" << endl;
+						cin.clear();
+						cin.ignore(1000, '\n');
+					}
+					if (InterviewScore < 0 || InterviewScore > 100) {
+						cout << "Invalid entry" << endl;
+					}
+				} while (InterviewScore < 0 || InterviewScore > 100);
+				r1.updateInterviewScore(ID, InterviewScore);
+				break;
+			}
+			case 11:
+				r1.detectDuplicates();
+				break;
+			case 12: {
+				string skill;
+				cin.ignore(1000, '\n');
+				cout << "\nEnter skill" << endl;
+				do {
+					getline(cin, skill);
+					if (skill.empty() || skill == "\n" || skill == "\0") {
+						cout << "Invalid string" << endl;
+					}
+				} while (skill.empty() || skill == "\n" || skill == "\0");
+				ArrayList<Candidate> arrayBySkill = r1.findCandidatesBySkill(skill);
+				cout << arrayBySkill.getCount() << " candidates found" << endl;
+				for (int i = 0; i < arrayBySkill.getCount(); i++) {
+					arrayBySkill.At(i).display();
+				}
+				break;
+			}
+			case 13: {
+				Stage* crowded = r1.getMostCrowdedStage();
+				if (crowded->candidates.getCount() == 0) {
+					cout << "No candidates in Pipeline" << endl;
+				}
+				else
+				{
+					cout << "\nStage name: " << crowded->stageName << endl;
+					cout << "number of candidates: " << crowded->candidates.getCount() << endl;
+				}
+				break;
+			}
+			case 14: {
+				int ID;
+				cout << "\nEnter Candidate ID to withdraw: ";
+				do {
+					while (!(cin >> ID)) {
+						cout << "Wrong data type" << endl;
+						cin.clear();
+						cin.ignore(1000, '\n');
+					}
+					if ((ID < 1000 || ID > 9999) || !r1.Search(ID)) {
+						cout << "Invalid entry" << endl;
+					}
+				} while ((ID < 1000 || ID > 9999) || !r1.Search(ID));
+				r1.withdrawCandidate(ID);
+				break;
+			}
+			case 15: {
+				r1.promoteEligibleCandidates();
+				cout << "promotion done" << endl;
+				break;
+			}
+			case 16: {
+				Candidate best = r1.getBestCandidate();
+				if (best.isComplete()) {
+					cout << "\nBest candidate details: " << endl;
+					best.display();
+				}
+				else {
+					cout << "Incomplete info/no eligible candidates found" << endl;
+				}
+				break;
+			}
+			case 0:
+				cout << "Program Exit" << endl;
+				return 0;
+			default:
+				break;
+			}
+		}
+		catch (const runtime_error& e) {
+			cout << e.what() << endl;
+		}
+	}
+	return 0;
+}
